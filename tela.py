@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import ttk
 root = Tk()
 
 class application():
@@ -7,6 +8,7 @@ class application():
         self.tela()
         self.frames_da_tela()
         self.widgets_frame_1()
+        self.lista_frame_2
         root.mainloop()
     def tela(self):
         self.root.title("Datamento")
@@ -77,6 +79,27 @@ class application():
 
         self.cidade_entry = Entry(self.frame_1)
         self.cidade_entry.place(relx = 0.5 , rely = 0.7, relheight =0.1 , relwidth = 0.4)
+
+    def lista_frame_2(self):
+        #Definindo quantidade de colunas
+        self.listaCli = ttk.Treeviwe(self.frame_2, height = 3, column = ("col1", "col2", "col3", "col4"))
+       
+        #Nomeando Colunas definidas
+        self.listaCli.heading("#0", text = "")
+        self.listaCli.heading("#1", text = "Código")
+        self.listaCli.heading("#2", text = "Nome")
+        self.listaCli.heading("#3", text = "Telefone")
+        self.listaCli.heading("#4", text = "Cidade")
+
+        #Tamanho das colunas, lembrando que a coluna 0 tem que ser declarada mas não aparece
+        self.listaCli.column("$0", width = 1)
+        self.listaCli.column("$1", width = 50)
+        self.listaCli.column("$2", width = 200)
+        self.listaCli.column("$3", width = 125)
+        self.listaCli.column("$4", width = 125)
+
+        #Declaração posições da lista
+        self.listaCli.place(relx = 0.01, rely = 0.01, relwidth = 0.95, relheight = 0.85)
 
 
 

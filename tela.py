@@ -1,14 +1,47 @@
 from tkinter import *
 from tkinter import ttk
+import sqlite3
+
+
 root = Tk()
 
-class application():
+# Funções de BackEnd
+# Classe (função) Limpa Tela
+class Funcs():
+    def limpa_tela(self):
+
+        self.codigo_entry.delete(0, END)
+        self.nome_entry.delete(0,  END)
+        self.telefone_entry.delete(0, END)
+        self.cidade_entry.delete(0, END)
+    def connecta_bd(self):
+        self.conn = sqlite3.connect("clientes.bd")
+        self.cursor = self.conn.cursor(); print("Conetando ao banco de dados")
+    def desconecta_bd(self):
+        self.conn.close(); print("Desconetando do banco de dados")
+    def montaTabelas(self):
+        self.connecta_bd()
+        ### Criar Tabela
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS clientes (
+                cod INTEGER PRIMARY KEY,
+                nome_cliente CHAR(40),
+                telefone INTEGER(20),
+                cidade CHAR(40)
+                );
+        """)
+        self.conn.commit(); print("Banco de dados criado!")
+        self.desconecta_bd()
+
+# Funções de FrontEnd
+class application(Funcs):
     def __init__ (self):
         self.root = root
         self.tela()
         self.frames_da_tela()
         self.widgets_frame_1()
         self.lista_frame_2()
+        self.montaTabelas()
         root.mainloop()
     def tela(self):
         self.root.title("Datamento")
@@ -29,7 +62,7 @@ class application():
     def widgets_frame_1(self):
         #criação do botão de limpar
         self.bt_limpar = Button(self.frame_1, text = "Limpar", bd = 1, bg = "#547EA0", fg = "white",
-                                font = ("verdana", 9, "bold"))
+                                font = ("verdana", 9, "bold"), command = self.limpa_tela)
         self.bt_limpar.place(relx = 0.2 , rely = 0.1, relwidth= 0.1, relheight= 0.15 )
 
          #criação do botão de Buscar

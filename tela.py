@@ -9,16 +9,18 @@ root = Tk()
 # Classe (função) Limpa Tela
 class Funcs():
     def limpa_tela(self):
-
         self.codigo_entry.delete(0, END)
         self.nome_entry.delete(0,  END)
         self.telefone_entry.delete(0, END)
         self.cidade_entry.delete(0, END)
+    
     def connecta_bd(self):
         self.conn = sqlite3.connect("clientes.bd")
         self.cursor = self.conn.cursor(); print("Conetando ao banco de dados")
+    
     def desconecta_bd(self):
         self.conn.close(); print("Desconetando do banco de dados")
+    
     def montaTabelas(self):
         self.connecta_bd()
         ### Criar Tabela
@@ -32,6 +34,54 @@ class Funcs():
         """)
         self.conn.commit(); print("Banco de dados criado!")
         self.desconecta_bd()
+    
+    def variaveis(self):
+        self.codigo = self.codigo_entry.get()
+        self.nome = self.nome_entry.get()
+        self.telefone = self.telefone_entry.get()
+        self.cidade = self.cidade_entry.get()
+
+    def botao_novo(self):
+        self.variaveis()
+        self.connecta_bd()
+
+        self.cursor.execute("""INSERT INTO clientes (nome_cliente, telefone, cidade)
+           VALUES (?, ?, ?)""", (self.nome, self.telefone, self.cidade))
+        self.conn.commit()
+        self.desconecta_bd()    
+        self.select_lista()
+        self.limpa_tela()
+    
+    def select_lista(self):
+        self.listaCli.delete(*self.listaCli.get_children())
+        self.connecta_bd()
+        lista = self.cursor.execute(""" SELECT cod, nome_cliente, telefone, cidade FROM clientes 
+            ORDER BY cod ASC; """)
+        for i in lista:
+           self.listaCli.insert("", END, values = i)
+        self.desconecta_bd()
+
+    # Função de Duplo Clique
+    def OnDoubleClick(self, event):
+        self.limpa_tela()
+        self.listaCli.selection()
+        
+        for n in self.listaCli.selection():
+            col1, col2, col3, col4 = self.listaCli.item(n, "values")
+            self.codigo_entry.insert(END, col1)
+            self.nome_entry.insert(END, col2)
+            self.telefone_entry.insert(END, col3)
+            self.cidade_entry.insert(END, col4)
+
+    # Função para deletar cliente
+    def deleta_cliente(self):
+        self.variaveis()
+        self.connecta_bd()
+        self.cursor.execute("""DELETE FROM clientes WHERE cod = ? """, self.codigo)
+        self.conn.commit()
+        self.desconecta_bd()
+        self.limpa_tela()
+        self.select_lista()
 
 # Funções de FrontEnd
 class application(Funcs):
@@ -42,7 +92,9 @@ class application(Funcs):
         self.widgets_frame_1()
         self.lista_frame_2()
         self.montaTabelas()
+        self.select_lista()
         root.mainloop()
+
     def tela(self):
         self.root.title("Datamento")
         self.root.configure(background = '#4E8397')
@@ -72,7 +124,7 @@ class application(Funcs):
 
         #criação do botão de Novo
         self.bt_novo = Button(self.frame_1, text = "Novo",bd = 1, bg = "#547EA0", fg = "white",
-                                font = ("verdana", 9, "bold"))
+                                font = ("verdana", 9, "bold"), command = self.botao_novo)
         self.bt_novo.place(relx = 0.42 , rely = 0.1, relwidth = 0.1, relheight = 0.15 )
 
         #criação do botão de Alterar
@@ -82,7 +134,7 @@ class application(Funcs):
 
         #criação do botão de Apagar
         self.bt_apagar = Button(self.frame_1, text = "Apagar",bd = 1, bg = "#547EA0", fg = "white",
-                                font = ("verdana", 9, "bold"))
+                                font = ("verdana", 9, "bold"), command = self.deleta_cliente)
         self.bt_apagar.place(relx = 0.64 , rely = 0.1, relwidth = 0.1, relheight = 0.15 )
 
         #Criação da lapel e entrada do Codigo
@@ -140,6 +192,7 @@ class application(Funcs):
         self.listaCli.configure(yscroll = self.scroolLista.set)
         #Onde ela fica
         self.scroolLista.place(relx = 0.96, rely = 0.1, relwidth = 0.04, relheight = 0.85)
+        self.listaCli.bind("<Double-1>", self.OnDoubleClick)
 
 
 

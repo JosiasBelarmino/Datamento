@@ -83,6 +83,23 @@ class Funcs():
         self.limpa_tela()
         self.select_lista()
 
+    def altera_cliente(self):
+        self.variaveis()
+        self.connecta_bd()
+        self.cursor.execute("""UPDATE clientes SET nome_cliente = ?, telefone = ?, cidade = ? 
+            WHERE cod = ?""",(self.nome, self.telefone, self.cidade, self.codigo))
+        self.conn.commit()
+        self.desconecta_bd()
+        self.select_lista()
+        self.limpa_tela()
+
+    
+
+
+
+
+
+
 # Funções de FrontEnd
 class application(Funcs):
     def __init__ (self):
@@ -93,6 +110,7 @@ class application(Funcs):
         self.lista_frame_2()
         self.montaTabelas()
         self.select_lista()
+        self.Menus()
         root.mainloop()
 
     def tela(self):
@@ -129,7 +147,7 @@ class application(Funcs):
 
         #criação do botão de Alterar
         self.bt_alterar = Button(self.frame_1, text = "Alterar",bd = 1, bg = "#547EA0", fg = "white",
-                                font = ("verdana", 9, "bold"))
+                                font = ("verdana", 9, "bold"), command = self.altera_cliente)
         self.bt_alterar.place(relx = 0.53 , rely = 0.1, relwidth = 0.1, relheight = 0.15 )
 
         #criação do botão de Apagar
@@ -194,7 +212,19 @@ class application(Funcs):
         self.scroolLista.place(relx = 0.96, rely = 0.1, relwidth = 0.04, relheight = 0.85)
         self.listaCli.bind("<Double-1>", self.OnDoubleClick)
 
+    def Menus(self):
+        menubar = Menu(self.root)
+        self.root.config(menu = menubar)
+        filemenu = Menu(menubar)
+        filemenu2 = Menu(menubar)
 
+        def Quit(): self.root.destroy()
+        
+        menubar.add_cascade(label = "Opções", menu = filemenu)
+        menubar.add_cascade(label = "Sobre", menu = filemenu2)
+
+        filemenu.add_command(label = "Sair", command= Quit)
+        filemenu2.add_command(label = "Limpa Cliente", command= self.limpa_tela )
 
 
 application()
